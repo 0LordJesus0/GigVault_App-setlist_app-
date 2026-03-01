@@ -19,7 +19,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.promusic.setlist.setlist_app"
+        applicationId = "com.promusic.gigvault"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

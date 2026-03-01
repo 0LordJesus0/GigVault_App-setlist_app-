@@ -124,6 +124,32 @@ class _SongReaderScreenState extends ConsumerState<SongReaderScreen> {
     'G':7,'G#':8,'Ab':8,'A':9,'A#':10,'Bb':10,'B':11
   };
 
+  // Çeviri Sözlüğü
+  final Map<String, Map<String, String>> _translations = {
+    'pointer': {'tr': 'İşaretçi (Kaydır)', 'en': 'Pointer (Pan)', 'de': 'Zeiger (Schwenken)', 'es': 'Puntero (Desplazar)'},
+    'pen': {'tr': 'Serbest Kalem', 'en': 'Freehand Pen', 'de': 'Freihandstift', 'es': 'Lápiz Libre'},
+    'arrow': {'tr': 'Ok Çizimi', 'en': 'Draw Arrow', 'de': 'Pfeil zeichnen', 'es': 'Dibujar Flecha'},
+    'eraserPixel': {'tr': 'Piksel Silgisi', 'en': 'Pixel Eraser', 'de': 'Pixel-Radierer', 'es': 'Borrador de Píxeles'},
+    'eraserObject': {'tr': 'Obje Silgisi', 'en': 'Object Eraser', 'de': 'Objekt-Radierer', 'es': 'Borrador de Objetos'},
+    'transpose': {'tr': 'TRANSPOZE', 'en': 'TRANSPOSE', 'de': 'TRANSPOZIEREN', 'es': 'TRANSPONER'},
+    'clearBoard': {'tr': 'Tahtayı Temizle', 'en': 'Clear Board', 'de': 'Tafel löschen', 'es': 'Limpiar Pizarra'},
+    'clearBoardDesc': {'tr': 'Tüm çizimleri ve notları silmek istediğine emin misin?', 'en': 'Are you sure you want to delete all drawings and notes?', 'de': 'Möchten Sie wirklich alle Zeichnungen und Notizen löschen?', 'es': '¿Estás seguro de que deseas eliminar todos los dibujos y notas?'},
+    'cancel': {'tr': 'İPTAL', 'en': 'CANCEL', 'de': 'ABBRECHEN', 'es': 'CANCELAR'},
+    'clear': {'tr': 'TEMİZLE', 'en': 'CLEAR', 'de': 'LÖSCHEN', 'es': 'LIMPIAR'},
+    'addNote': {'tr': 'Not Ekle', 'en': 'Add Note', 'de': 'Notiz hinzufügen', 'es': 'Añadir Nota'},
+    'editNote': {'tr': 'Notu Düzenle', 'en': 'Edit Note', 'de': 'Notiz bearbeiten', 'es': 'Editar Nota'},
+    'textHint': {'tr': 'Metin...', 'en': 'Text...', 'de': 'Text...', 'es': 'Texto...'},
+    'save': {'tr': 'KAYDET', 'en': 'SAVE', 'de': 'SPEICHERN', 'es': 'GUARDAR'},
+    'noteTooltip': {'tr': "Düzenlemek için çift tıkla.\nSilmek için 'Obje Silgisi'ni veya çöp kutusunu kullan.", 'en': "Double tap to edit.\nUse 'Object Eraser' or trash can to delete.", 'de': "Zum Bearbeiten doppeltippen.\nVerwenden Sie 'Objekt-Radierer' oder den Papierkorb zum Löschen.", 'es': "Toca dos veces para editar.\nUsa el 'Borrador de Objetos' o la papelera para eliminar."},
+    'editLyricsTitle': {'tr': 'Sözleri Düzenle', 'en': 'Edit Lyrics', 'de': 'Songtext bearbeiten', 'es': 'Editar Letra'},
+    'readingSettings': {'tr': 'OKUMA AYARLARI', 'en': 'READING SETTINGS', 'de': 'LESEEINSTELLUNGEN', 'es': 'AJUSTES DE LECTURA'},
+    'globalChordColor': {'tr': 'Global Akor Rengi', 'en': 'Global Chord Color', 'de': 'Globale Akkordfarbe', 'es': 'Color Global de Acordes'},
+  };
+
+  String _t(String key, String lang) {
+    return _translations[key]?[lang] ?? _translations[key]?['tr'] ?? key;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -199,13 +225,13 @@ class _SongReaderScreenState extends ConsumerState<SongReaderScreen> {
     }
   }
 
-  String _getToolName(DrawingTool tool) {
+  String _getToolName(DrawingTool tool, String lang) {
     switch (tool) {
-      case DrawingTool.pointer: return 'İşaretçi (Kaydır)';
-      case DrawingTool.pen: return 'Serbest Kalem';
-      case DrawingTool.arrow: return 'Ok Çizimi';
-      case DrawingTool.eraserPixel: return 'Piksel Silgisi';
-      case DrawingTool.eraserObject: return 'Obje Silgisi';
+      case DrawingTool.pointer: return _t('pointer', lang);
+      case DrawingTool.pen: return _t('pen', lang);
+      case DrawingTool.arrow: return _t('arrow', lang);
+      case DrawingTool.eraserPixel: return _t('eraserPixel', lang);
+      case DrawingTool.eraserObject: return _t('eraserObject', lang);
     }
   }
 
@@ -284,6 +310,9 @@ class _SongReaderScreenState extends ConsumerState<SongReaderScreen> {
     final isFullColor = ref.watch(isFullColorProvider); 
     final globalChordColor = ref.watch(globalChordColorProvider); 
     
+    // Doğrudan ana sayfanın dil şebekesine bağlandık!
+    final lang = ref.watch(appLanguageProvider); 
+    
     final rawAppThemeColor = ref.watch(appThemeColorProvider);
     
     final bgColor = isDark ? const Color(0xFF0A0A0A) : const Color(0xFFF8F9FA);
@@ -322,11 +351,11 @@ class _SongReaderScreenState extends ConsumerState<SongReaderScreen> {
           ),
           IconButton(
             icon: Icon(Icons.edit_note, color: uiContentColor, size: 28),
-            onPressed: () => _showQuickEditDialog(context, isDark, uiThemeColor, textColor),
+            onPressed: () => _showQuickEditDialog(context, isDark, uiThemeColor, textColor, lang),
           ),
           IconButton(
             icon: Icon(Icons.settings_outlined, color: uiContentColor), 
-            onPressed: () => _showReaderSettings(context, isDark, textColor, globalChordColor, uiThemeColor),
+            onPressed: () => _showReaderSettings(context, isDark, textColor, globalChordColor, uiThemeColor, lang),
           )
         ],
         bottom: PreferredSize(
@@ -339,8 +368,8 @@ class _SongReaderScreenState extends ConsumerState<SongReaderScreen> {
               border: Border(bottom: BorderSide(color: isFullColor ? Colors.transparent : uiThemeColor.withOpacity(0.2), width: 1.5))
             ),
             child: _isDrawingMode 
-                ? _buildDrawingToolbar(uiContentColor, isDark, isFullColor) 
-                : _buildTransposeToolbar(uiContentColor, isFullColor),
+                ? _buildDrawingToolbar(uiContentColor, isDark, isFullColor, lang) 
+                : _buildTransposeToolbar(uiContentColor, isFullColor, lang),
           ),
         ),
       ),
@@ -349,14 +378,14 @@ class _SongReaderScreenState extends ConsumerState<SongReaderScreen> {
           width: double.infinity,
           height: double.infinity,
           child: _isFitToScreen 
-            ? _buildFittedView(adaptedChordColor, textColor, isDark, uiThemeColor)
-            : _buildInteractiveView(adaptedChordColor, textColor, isDark, uiThemeColor), 
+            ? _buildFittedView(adaptedChordColor, textColor, isDark, uiThemeColor, lang)
+            : _buildInteractiveView(adaptedChordColor, textColor, isDark, uiThemeColor, lang), 
         ),
       ),
     );
   }
 
-  Widget _buildTransposeToolbar(Color uiColor, bool isFullColor) {
+  Widget _buildTransposeToolbar(Color uiColor, bool isFullColor, String lang) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -374,7 +403,7 @@ class _SongReaderScreenState extends ConsumerState<SongReaderScreen> {
         ),
         Row(
           children: [
-            Text('TRANSPOZE', style: GoogleFonts.montserrat(color: isFullColor ? uiColor.withOpacity(0.9) : uiColor.withOpacity(0.7), fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1)),
+            Text(_t('transpose', lang), style: GoogleFonts.montserrat(color: isFullColor ? uiColor.withOpacity(0.9) : uiColor.withOpacity(0.7), fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1)),
             const SizedBox(width: 8),
             _buildMiniButton(Icons.remove, () {
               if (_currentStep > -11) {
@@ -400,7 +429,7 @@ class _SongReaderScreenState extends ConsumerState<SongReaderScreen> {
     );
   }
 
-  Widget _buildDrawingToolbar(Color uiColor, bool isDark, bool isFullColor) {
+  Widget _buildDrawingToolbar(Color uiColor, bool isDark, bool isFullColor, String lang) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -440,11 +469,10 @@ class _SongReaderScreenState extends ConsumerState<SongReaderScreen> {
                 ),
               )
             else
-              Text(_getToolName(_currentTool), style: TextStyle(color: uiColor, fontSize: 12, fontWeight: FontWeight.bold)),
+              Text(_getToolName(_currentTool, lang), style: TextStyle(color: uiColor, fontSize: 12, fontWeight: FontWeight.bold)),
           ],
         ),
         
-        // MATEMATİKSEL OLARAK FIRÇA ÇAPINA (%100) EŞİTLENMİŞ NOKTA
         Row(
           children: [
             Icon(Icons.circle, size: 6, color: uiColor.withOpacity(0.7)),
@@ -452,8 +480,6 @@ class _SongReaderScreenState extends ConsumerState<SongReaderScreen> {
               child: SliderTheme(
                 data: SliderTheme.of(context).copyWith(
                   trackHeight: 4.0,
-                  // Yarıçap = Fırça Kalınlığı / 2 
-                  // math.max(4.0, ...) ile 8 pikselden daha ufak olup kaybolması engellendi.
                   thumbShape: RoundSliderThumbShape(
                     enabledThumbRadius: math.max(4.0, _brushSize / 2), 
                     pressedElevation: 6.0,
@@ -483,7 +509,7 @@ class _SongReaderScreenState extends ConsumerState<SongReaderScreen> {
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
               icon: Icon(Icons.text_fields, color: uiColor, size: 24),
-              onPressed: () => _showAddTextDialog(isDark, uiColor), 
+              onPressed: () => _showAddTextDialog(isDark, uiColor, lang), 
             ),
           ],
         ),
@@ -521,7 +547,7 @@ class _SongReaderScreenState extends ConsumerState<SongReaderScreen> {
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                   icon: Icon(Icons.delete_sweep, color: Colors.redAccent.withOpacity(0.8), size: 22),
-                  onPressed: () => _showClearAllConfirmation(isDark), 
+                  onPressed: () => _showClearAllConfirmation(isDark, lang), 
                 ),
                 const SizedBox(width: 12),
                 GestureDetector(
@@ -613,7 +639,7 @@ class _SongReaderScreenState extends ConsumerState<SongReaderScreen> {
     );
   }
 
-  Widget _buildStackContent(Color chordColor, Color textColor, bool isDark, Color uiThemeColor) {
+  Widget _buildStackContent(Color chordColor, Color textColor, bool isDark, Color uiThemeColor, String lang) {
     double cursorRadius = 20.0 + _brushSize;
 
     return GestureDetector(
@@ -742,14 +768,14 @@ class _SongReaderScreenState extends ConsumerState<SongReaderScreen> {
                         ScaffoldMessenger.of(context).clearSnackBars();
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: const Row(
+                            content: Row(
                               children: [
-                                Icon(Icons.lightbulb_outline, color: Colors.white),
-                                SizedBox(width: 12),
+                                const Icon(Icons.lightbulb_outline, color: Colors.white),
+                                const SizedBox(width: 12),
                                 Expanded(
                                   child: Text(
-                                    "Düzenlemek için çift tıkla.\nSilmek için 'Obje Silgisi'ni veya çöp kutusunu kullan.",
-                                    style: TextStyle(color: Colors.white, fontSize: 13, height: 1.4),
+                                    _t('noteTooltip', lang),
+                                    style: const TextStyle(color: Colors.white, fontSize: 13, height: 1.4),
                                   ),
                                 ),
                               ],
@@ -764,7 +790,7 @@ class _SongReaderScreenState extends ConsumerState<SongReaderScreen> {
                       }
                     },
                     onDoubleTap: isPointer ? () {
-                      _showAddTextDialog(isDark, uiThemeColor, existingNode: node);
+                      _showAddTextDialog(isDark, uiThemeColor, lang, existingNode: node);
                     } : null,
                     
                     onScaleStart: isPointer ? (details) {
@@ -850,7 +876,7 @@ class _SongReaderScreenState extends ConsumerState<SongReaderScreen> {
     );
   }
 
-  Widget _buildFittedView(Color chordColor, Color textColor, bool isDark, Color uiThemeColor) {
+  Widget _buildFittedView(Color chordColor, Color textColor, bool isDark, Color uiThemeColor, String lang) {
     bool canScroll = !_isDrawingMode || _currentTool == DrawingTool.pointer;
     
     return SingleChildScrollView(
@@ -861,13 +887,13 @@ class _SongReaderScreenState extends ConsumerState<SongReaderScreen> {
         child: FittedBox(
           fit: BoxFit.scaleDown, 
           alignment: Alignment.centerLeft,
-          child: _buildStackContent(chordColor, textColor, isDark, uiThemeColor), 
+          child: _buildStackContent(chordColor, textColor, isDark, uiThemeColor, lang), 
         ),
       ),
     );
   }
 
-  Widget _buildInteractiveView(Color chordColor, Color textColor, bool isDark, Color uiThemeColor) {
+  Widget _buildInteractiveView(Color chordColor, Color textColor, bool isDark, Color uiThemeColor, String lang) {
     bool canPanScale = !_isDrawingMode || _currentTool == DrawingTool.pointer;
 
     return InteractiveViewer(
@@ -880,20 +906,20 @@ class _SongReaderScreenState extends ConsumerState<SongReaderScreen> {
       boundaryMargin: const EdgeInsets.all(80.0), 
       child: Padding(
         padding: const EdgeInsets.all(24.0),
-        child: _buildStackContent(chordColor, textColor, isDark, uiThemeColor), 
+        child: _buildStackContent(chordColor, textColor, isDark, uiThemeColor, lang), 
       ),
     );
   }
 
-  void _showClearAllConfirmation(bool isDark) {
+  void _showClearAllConfirmation(bool isDark, String lang) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: isDark ? const Color(0xFF2C2C2C) : Colors.white,
-        title: Text('Tahtayı Temizle', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
-        content: Text('Tüm çizimleri ve notları silmek istediğine emin misin?', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54)),
+        title: Text(_t('clearBoard', lang), style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+        content: Text(_t('clearBoardDesc', lang), style: TextStyle(color: isDark ? Colors.white70 : Colors.black54)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: Text('İPTAL', style: TextStyle(color: isDark ? Colors.white54 : Colors.black54))),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(_t('cancel', lang), style: TextStyle(color: isDark ? Colors.white54 : Colors.black54))),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
             onPressed: () {
@@ -906,14 +932,14 @@ class _SongReaderScreenState extends ConsumerState<SongReaderScreen> {
               _saveTexts();
               Navigator.pop(context);
             },
-            child: const Text('TEMİZLE', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            child: Text(_t('clear', lang), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
     );
   }
 
-  void _showAddTextDialog(bool isDark, Color uiColor, {TextNode? existingNode}) {
+  void _showAddTextDialog(bool isDark, Color uiColor, String lang, {TextNode? existingNode}) {
     TextEditingController ctrl = TextEditingController(text: existingNode?.text ?? '');
     String selectedColor = existingNode?.colorName ?? _brushColorName;
     Color btnTextColor = _isLightColorForBg(uiColor) ? Colors.black87 : Colors.white;
@@ -926,7 +952,7 @@ class _SongReaderScreenState extends ConsumerState<SongReaderScreen> {
             return AlertDialog(
               backgroundColor: isDark ? const Color(0xFF1A1A1A) : Colors.white,
               title: Text(
-                existingNode == null ? 'Not Ekle' : 'Notu Düzenle', 
+                existingNode == null ? _t('addNote', lang) : _t('editNote', lang), 
                 style: TextStyle(color: isDark ? Colors.white : Colors.black87, fontWeight: FontWeight.bold)
               ),
               content: Column(
@@ -938,7 +964,7 @@ class _SongReaderScreenState extends ConsumerState<SongReaderScreen> {
                     autofocus: true,
                     style: TextStyle(color: isDark ? Colors.white : Colors.black87, fontSize: 18),
                     decoration: InputDecoration(
-                      hintText: 'Metin...',
+                      hintText: _t('textHint', lang),
                       hintStyle: TextStyle(color: isDark ? Colors.white38 : Colors.black38),
                       enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.black12)),
                       focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: uiColor)),
@@ -960,7 +986,7 @@ class _SongReaderScreenState extends ConsumerState<SongReaderScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context), 
-                  child: Text('İPTAL', style: TextStyle(color: isDark ? Colors.white54 : Colors.black54))
+                  child: Text(_t('cancel', lang), style: TextStyle(color: isDark ? Colors.white54 : Colors.black54))
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(backgroundColor: uiColor),
@@ -990,7 +1016,7 @@ class _SongReaderScreenState extends ConsumerState<SongReaderScreen> {
                     }
                     Navigator.pop(context);
                   },
-                  child: Text('KAYDET', style: TextStyle(color: btnTextColor, fontWeight: FontWeight.bold)),
+                  child: Text(_t('save', lang), style: TextStyle(color: btnTextColor, fontWeight: FontWeight.bold)),
                 )
               ]
             );
@@ -1033,7 +1059,7 @@ class _SongReaderScreenState extends ConsumerState<SongReaderScreen> {
     );
   }
 
-  void _showQuickEditDialog(BuildContext context, bool isDark, Color themeColor, Color textColor) {
+  void _showQuickEditDialog(BuildContext context, bool isDark, Color themeColor, Color textColor, String lang) {
     TextEditingController editCtrl = TextEditingController(text: widget.song.content);
     Color btnTextColor = _isLightColorForBg(themeColor) ? Colors.black87 : Colors.white;
 
@@ -1042,7 +1068,7 @@ class _SongReaderScreenState extends ConsumerState<SongReaderScreen> {
       builder: (context) {
         return AlertDialog(
           backgroundColor: isDark ? const Color(0xFF1A1A1A) : Colors.white,
-          title: Text('Sözleri Düzenle', style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
+          title: Text(_t('editLyricsTitle', lang), style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
           content: SizedBox(
             width: double.maxFinite,
             child: TextField(
@@ -1056,14 +1082,14 @@ class _SongReaderScreenState extends ConsumerState<SongReaderScreen> {
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: Text('İPTAL', style: TextStyle(color: isDark ? Colors.white54 : Colors.black54))),
+            TextButton(onPressed: () => Navigator.pop(context), child: Text(_t('cancel', lang), style: TextStyle(color: isDark ? Colors.white54 : Colors.black54))),
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: themeColor),
               onPressed: () {
                 setState(() { widget.song.content = editCtrl.text; widget.song.save(); });
                 Navigator.pop(context);
               },
-              child: Text('KAYDET', style: TextStyle(color: btnTextColor, fontWeight: FontWeight.bold)),
+              child: Text(_t('save', lang), style: TextStyle(color: btnTextColor, fontWeight: FontWeight.bold)),
             ),
           ],
         );
@@ -1071,7 +1097,7 @@ class _SongReaderScreenState extends ConsumerState<SongReaderScreen> {
     );
   }
 
-  void _showReaderSettings(BuildContext context, bool isDark, Color textColor, Color currentColor, Color appThemeColor) {
+  void _showReaderSettings(BuildContext context, bool isDark, Color textColor, Color currentColor, Color appThemeColor, String lang) {
     showModalBottomSheet(
       context: context,
       backgroundColor: isDark ? const Color(0xFF1A1A1A) : Colors.white,
@@ -1083,9 +1109,9 @@ class _SongReaderScreenState extends ConsumerState<SongReaderScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('OKUMA AYARLARI', style: GoogleFonts.montserrat(color: textColor, fontSize: 18, fontWeight: FontWeight.bold)),
+              Text(_t('readingSettings', lang), style: GoogleFonts.montserrat(color: textColor, fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 24),
-              Text('Global Akor Rengi', style: TextStyle(color: isDark ? Colors.white54 : Colors.black54, fontWeight: FontWeight.bold)),
+              Text(_t('globalChordColor', lang), style: TextStyle(color: isDark ? Colors.white54 : Colors.black54, fontWeight: FontWeight.bold)),
               const SizedBox(height: 12),
               SizedBox(
                 height: 40,
@@ -1276,7 +1302,7 @@ class DrawingPainter extends CustomPainter {
     double dY = p2.dy - p1.dy;
     double angle = math.atan2(dY, dX);
     
-    double arrowSize = paint.strokeWidth * 3 + 10; 
+    double arrowSize = paint.strokeWidth * 3 + 10;  
 
     Path arrowPath = Path();
     arrowPath.moveTo(p2.dx - arrowSize * math.cos(angle - math.pi / 6), p2.dy - arrowSize * math.sin(angle - math.pi / 6)); 
